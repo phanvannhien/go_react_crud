@@ -1,0 +1,22 @@
+# .github/workflows/deploy-staging.yml
+name: Deploy Staging
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            docker pull ghcr.io/${{ github.repository }}/backend:staging
+            docker pull ghcr.io/${{ github.repository }}/frontend:staging
+            docker compose -f docker-compose.staging.yml up -d

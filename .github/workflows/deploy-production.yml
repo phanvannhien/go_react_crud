@@ -1,0 +1,26 @@
+# .github/workflows/deploy-production.yml
+name: Deploy Production
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+      url: https://yourdomain.com
+
+    steps:
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            docker pull ghcr.io/${{ github.repository }}/backend:latest
+            docker pull ghcr.io/${{ github.repository }}/frontend:latest
+            docker compose -f docker-compose.prod.yml up -d

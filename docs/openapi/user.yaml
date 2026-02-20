@@ -1,0 +1,234 @@
+openapi: "3.0.3"
+info:
+  title: User API
+  version: "1.0.0"
+  description: User management endpoints with offset pagination, filtering, and sorting.
+
+paths:
+  /api/users:
+    get:
+      summary: List users with pagination, filters, and sorting
+      operationId: listUsers
+      tags: [Users]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [email, role, created_at]
+            default: created_at
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: search
+          in: query
+          description: Search by email (ILIKE)
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [user, admin]
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Paginated list of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+
+  /api/users/{id}:
+    get:
+      summary: Get user by ID
+      operationId: getUser
+      tags: [Users]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSuccessResponse"
+        "404":
+          description: User not found
+        "401":
+          description: Unauthorized
+
+    put:
+      summary: Update user
+      operationId: updateUser
+      tags: [Users]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSuccessResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: User not found
+        "409":
+          description: Email conflict
+        "401":
+          description: Unauthorized
+
+    delete:
+      summary: Delete user
+      operationId: deleteUser
+      tags: [Users]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User deleted
+        "404":
+          description: User not found
+        "401":
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        role:
+          type: string
+          enum: [user, admin]
+        is_active:
+          type: boolean
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+
+    UserListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+        error:
+          type: "null"
+
+    UserSuccessResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/User"
+        error:
+          type: "null"
+
+    ErrorResponse:
+      type: object
+      properties:
+        data:
+          type: "null"
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string

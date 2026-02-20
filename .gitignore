@@ -1,0 +1,39 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+full_rest_app
+
+# Go
+/vendor/
+go.work
+go.work.sum
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend
+ui/node_modules/
+ui/dist/
+ui/.vite/
+
+# sqlc generated (optional: remove if you want to track)
+# db/sqlc/
+
+# Test
+*.test
+*.out
+coverage.txt

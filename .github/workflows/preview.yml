@@ -1,0 +1,23 @@
+# .github/workflows/preview.yml
+name: Preview Environment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Preview Images
+        run: |
+          docker build -t backend:pr-${{ github.event.number }} -f Dockerfile.backend .
+          docker build -t frontend:pr-${{ github.event.number }} -f Dockerfile.frontend ./ui
+
+      - name: Deploy Preview (example)
+        run: |
+          echo "Deploy preview for PR #${{ github.event.number }}"
+          # Hook into your infra (Fly.io, Railway, k8s namespace, etc.)

@@ -1,0 +1,269 @@
+openapi: "3.0.3"
+info:
+  title: Product API
+  version: "1.0.0"
+  description: Product management endpoints with cursor pagination and multi-filter support.
+
+paths:
+  /api/products:
+    get:
+      summary: List products with cursor pagination and filters
+      operationId: listProducts
+      tags: [Products]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: cursor
+          in: query
+          description: RFC3339 timestamp cursor for pagination
+          schema:
+            type: string
+            format: date-time
+        - name: search
+          in: query
+          description: Search by product name (ILIKE)
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: min_stock
+          in: query
+          schema:
+            type: integer
+        - name: min_price
+          in: query
+          schema:
+            type: number
+        - name: max_price
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Cursor-paginated list of products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductCursorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+
+    post:
+      summary: Create a new product
+      operationId: createProduct
+      tags: [Products]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSuccessResponse"
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+
+  /api/products/{id}:
+    get:
+      summary: Get product by ID
+      operationId: getProduct
+      tags: [Products]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSuccessResponse"
+        "404":
+          description: Product not found
+        "401":
+          description: Unauthorized
+
+    put:
+      summary: Update product
+      operationId: updateProduct
+      tags: [Products]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductRequest"
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSuccessResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Product not found
+        "401":
+          description: Unauthorized
+
+    delete:
+      summary: Delete product
+      operationId: deleteProduct
+      tags: [Products]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Product deleted
+        "401":
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category_id:
+          type: string
+          format: uuid
+        stock:
+          type: integer
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateProductRequest:
+      type: object
+      required: [name, price, category_id]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 5000
+        price:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+        category_id:
+          type: string
+          format: uuid
+        stock:
+          type: integer
+          minimum: 0
+        is_active:
+          type: boolean
+          default: true
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 5000
+        price:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+        category_id:
+          type: string
+          format: uuid
+        stock:
+          type: integer
+          minimum: 0
+        is_active:
+          type: boolean
+
+    ProductCursorResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        next_cursor:
+          type: string
+          description: RFC3339 timestamp for next page, empty if no more
+        error:
+          type: "null"
+
+    ProductSuccessResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Product"
+        error:
+          type: "null"
