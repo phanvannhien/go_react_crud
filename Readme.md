@@ -111,14 +111,20 @@ docker run -p 8081:8080 -e SWAGGER_JSON=/spec/auth.yaml -v $(pwd)/docs/openapi:/
         ├── lib/               # API client, auth context
         └── features/          # auth, user, product modules
 ```
-# 📊 AI Agent Autonomous Level Now
+# 📊 Kiến trúc hoàn chỉnh
+```
 
-| Layer | Status |
-| --- | --- |
-| Schema Safety | ✔ |
-| Data Integrity | ✔ |
-| Transaction Safety | ✔ |
-| API Stability | ✔ |
-| Operational Risk Control | ✔ |
-| Deployment Resilience | ✔ |
-| Compliance Traceability | ✔ |
+User Prompt  
+    ↓  
+agent_runtime  
+    ↓  
+risk_scoring  
+    ↓  
+skill_router  
+    ↓  
+skills activated  
+    ↓  
+execution_policy  
+    ↓  
+safe output
+```
