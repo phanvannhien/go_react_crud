@@ -1,26 +1,23 @@
-# Global Architecture Rules
+# Architecture Rules
 
-Backend and frontend must be decoupled.
+Backend structure:
 
-Backend:
-- RESTful
-- Stateless
-- No session storage
-- JWT for authentication
+app/
+  cmd/
+  internal/
+    handler/
+    service/
+    repository/
+    middleware/
+  db/
+    migrations/
+    query/
 
-Frontend:
-- Token stored in memory or httpOnly cookie
-- No localStorage for sensitive data
+Rules:
 
-Cross Rules:
-- All timestamps must be RFC3339
-- All IDs must be UUID
-- Pagination standard:
-  {
-    "data": [],
-    "meta": {
-      "page": 1,
-      "limit": 20,
-      "total": 100
-    }
-  }
+- handler → service → repository (sqlc)
+- handler must not access db directly
+- service must not know HTTP layer
+- repository wraps sqlc generated code
+- transaction logic stays in service
+- dependency direction is inward only
