@@ -19,6 +19,7 @@ type Querier interface {
 	CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error)
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
+	DeleteCategory(ctx context.Context, id pgtype.UUID) error
 	DeleteOrder(ctx context.Context, id pgtype.UUID) error
 	DeleteOrderItemsByOrderID(ctx context.Context, orderID pgtype.UUID) error
 	DeleteProduct(ctx context.Context, id pgtype.UUID) error
@@ -33,6 +34,7 @@ type Querier interface {
 	ListOrdersByUserID(ctx context.Context, arg ListOrdersByUserIDParams) ([]Order, error)
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
+	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error)
 	UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) (Order, error)
 	UpdateOrderTotal(ctx context.Context, arg UpdateOrderTotalParams) (Order, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)

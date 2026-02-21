@@ -72,33 +72,24 @@ func (s *UserService) ListUsers(ctx context.Context, params UserListParams) (*Us
 
 	offset := (params.Page - 1) * params.Limit
 
-	// Build filter params - use empty/zero for nil (sqlc NULL pattern)
+	// Build filter params - use empty string for nil (match SQL $x = '' pattern)
 	var searchParam string
 	var roleParam string
-	var isActiveParam bool
-
-	searchNull := true
-	roleNull := true
-	isActiveNull := true
+	var isActiveParam string
 
 	if params.Search != nil && *params.Search != "" {
 		searchParam = *params.Search
-		searchNull = false
 	}
 	if params.Role != nil && *params.Role != "" {
 		roleParam = *params.Role
-		roleNull = false
 	}
 	if params.IsActive != nil {
-		isActiveParam = *params.IsActive
-		isActiveNull = false
+		if *params.IsActive {
+			isActiveParam = "true"
+		} else {
+			isActiveParam = "false"
+		}
 	}
-
-	// For sqlc: empty string / false counts as NULL via the ($1::text IS NULL OR ...) pattern
-	// We need to pass the actual values or handle NULL via the pgtype wrappers
-	_ = searchNull
-	_ = roleNull
-	_ = isActiveNull
 
 	listParams := sqlc.ListUsersParams{
 		Column1:   searchParam,

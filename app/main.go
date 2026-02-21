@@ -58,12 +58,14 @@ func main() {
 	userService := service.NewUserService(queries)
 	productService := service.NewProductService(queries)
 	orderService := service.NewOrderService(queries, pool)
+	categoryService := service.NewCategoryService(queries)
 
 	// Initialize handlers
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService)
 	productHandler := handler.NewProductHandler(productService)
 	orderHandler := handler.NewOrderHandler(orderService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	// Create Echo instance
 	e := echo.New()
@@ -88,6 +90,7 @@ func main() {
 	routes.RegisterUserRoutes(api, userHandler)
 	routes.RegisterProductRoutes(api, productHandler)
 	routes.RegisterOrderRoutes(api, orderHandler)
+	routes.RegisterCategoryRoutes(api, categoryHandler)
 
 	// Health check
 	e.GET("/health", func(c echo.Context) error {

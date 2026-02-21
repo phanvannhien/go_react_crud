@@ -16,3 +16,12 @@ LIMIT $1 OFFSET $2;
 
 -- name: CountCategories :one
 SELECT count(*) FROM categories;
+
+-- name: UpdateCategory :one
+UPDATE categories
+SET name = $2, updated_at = now()
+WHERE id = $1
+RETURNING id, name, created_at, updated_at;
+
+-- name: DeleteCategory :exec
+DELETE FROM categories WHERE id = $1;

@@ -100,7 +100,11 @@ func (s *ProductService) ListProducts(ctx context.Context, params ProductListPar
 
 	// IsActive filter
 	if params.IsActive != nil {
-		listParams.Column3 = *params.IsActive
+		if *params.IsActive {
+			listParams.Column3 = "true"
+		} else {
+			listParams.Column3 = "false"
+		}
 	}
 
 	// MinStock filter

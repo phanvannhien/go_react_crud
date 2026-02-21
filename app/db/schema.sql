@@ -31,6 +31,35 @@ CREATE TABLE public.categories (
 
 
 --
+-- Name: order_items; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.order_items (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    order_id uuid NOT NULL,
+    product_id uuid NOT NULL,
+    quantity integer NOT NULL,
+    price numeric NOT NULL,
+    CONSTRAINT order_items_quantity_check CHECK ((quantity > 0))
+);
+
+
+--
+-- Name: orders; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.orders (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    status text DEFAULT 'pending'::text NOT NULL,
+    total_amount numeric DEFAULT 0 NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT orders_status_check CHECK ((status = ANY (ARRAY['pending'::text, 'paid'::text, 'cancelled'::text, 'shipped'::text])))
+);
+
+
+--
 -- Name: products; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -80,6 +109,22 @@ ALTER TABLE ONLY public.categories
 
 
 --
+-- Name: order_items order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.order_items
+    ADD CONSTRAINT order_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: products products_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -108,6 +153,41 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE UNIQUE INDEX idx_categories_name ON public.categories USING btree (name);
+
+
+--
+-- Name: idx_order_items_order_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_order_items_order_id ON public.order_items USING btree (order_id);
+
+
+--
+-- Name: idx_order_items_product_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_order_items_product_id ON public.order_items USING btree (product_id);
+
+
+--
+-- Name: idx_orders_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_orders_created_at ON public.orders USING btree (created_at);
+
+
+--
+-- Name: idx_orders_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_orders_status ON public.orders USING btree (status);
+
+
+--
+-- Name: idx_orders_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_orders_user_id ON public.orders USING btree (user_id);
 
 
 --
@@ -188,6 +268,22 @@ CREATE INDEX idx_users_role ON public.users USING btree (role);
 
 
 --
+-- Name: order_items order_items_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.order_items
+    ADD CONSTRAINT order_items_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id) ON DELETE CASCADE;
+
+
+--
+-- Name: orders orders_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: products products_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -209,4 +305,5 @@ ALTER TABLE ONLY public.products
 INSERT INTO public.schema_migrations (version) VALUES
     ('20260220092500'),
     ('20260220092501'),
-    ('20260220092502');
+    ('20260220092502'),
+    ('20260221080000');

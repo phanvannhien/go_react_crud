@@ -86,10 +86,10 @@ const listProducts = `-- name: ListProducts :many
 SELECT id, name, description, price, category_id, stock, is_active, created_at, updated_at
 FROM products
 WHERE
-    ($1::text IS NULL OR name ILIKE '%' || $1 || '%')
+    ($1::text = '' OR name ILIKE '%' || $1 || '%')
     AND ($2::uuid IS NULL OR category_id = $2)
-    AND ($3::boolean IS NULL OR is_active = $3)
-    AND ($4::integer IS NULL OR stock >= $4)
+    AND ($3::text = '' OR is_active = ($3::text = 'true'))
+    AND ($4::integer = 0 OR stock >= $4)
     AND ($5::numeric IS NULL OR price >= $5)
     AND ($6::numeric IS NULL OR price <= $6)
     AND ($7::timestamptz IS NULL OR created_at < $7)
@@ -100,7 +100,7 @@ LIMIT $8
 type ListProductsParams struct {
 	Column1 string             `json:"column_1"`
 	Column2 pgtype.UUID        `json:"column_2"`
-	Column3 bool               `json:"column_3"`
+	Column3 string             `json:"column_3"`
 	Column4 int32              `json:"column_4"`
 	Column5 pgtype.Numeric     `json:"column_5"`
 	Column6 pgtype.Numeric     `json:"column_6"`

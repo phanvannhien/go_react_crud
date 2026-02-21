@@ -17,9 +17,9 @@ WHERE email = $1;
 SELECT id, email, role, is_active, created_at, updated_at
 FROM users
 WHERE
-    ($1::text IS NULL OR email ILIKE '%' || $1 || '%')
-    AND ($2::text IS NULL OR role = $2)
-    AND ($3::boolean IS NULL OR is_active = $3)
+    ($1::text = '' OR email ILIKE '%' || $1 || '%')
+    AND ($2::text = '' OR role = $2)
+    AND ($3::text = '' OR is_active = ($3::text = 'true'))
 ORDER BY
     CASE WHEN @sort_field::text = 'email' AND @sort_order::text = 'asc' THEN email END ASC,
     CASE WHEN @sort_field::text = 'email' AND @sort_order::text = 'desc' THEN email END DESC,
@@ -33,9 +33,9 @@ LIMIT $4 OFFSET $5;
 -- name: CountUsers :one
 SELECT count(*) FROM users
 WHERE
-    ($1::text IS NULL OR email ILIKE '%' || $1 || '%')
-    AND ($2::text IS NULL OR role = $2)
-    AND ($3::boolean IS NULL OR is_active = $3);
+    ($1::text = '' OR email ILIKE '%' || $1 || '%')
+    AND ($2::text = '' OR role = $2)
+    AND ($3::text = '' OR is_active = ($3::text = 'true'));
 
 -- name: UpdateUser :one
 UPDATE users

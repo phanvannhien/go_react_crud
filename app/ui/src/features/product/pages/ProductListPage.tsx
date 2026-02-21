@@ -3,6 +3,8 @@ import { useProductList } from '../hooks/useProductList';
 import { deleteProductAPI, createProductAPI } from '../api';
 import { createProductSchema } from '../schema';
 import { APIError } from '../../../lib/api-client';
+import SearchableSelect, { type SearchableOption } from '../../../lib/SearchableSelect';
+import { listCategoriesAPI } from '../../category/api';
 
 export default function ProductListPage() {
     const { products, nextCursor, loading, error, updateFilters, loadMore, fetchProducts } = useProductList();
@@ -186,6 +188,15 @@ function CreateProductForm({ onCreated }: { onCreated: () => void }) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [serverError, setServerError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [categoryOptions, setCategoryOptions] = useState<SearchableOption[]>([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(false);
+
+    useEffect(() => {
+        setCategoriesLoading(true);
+        listCategoriesAPI({ page: 1, limit: 100 }).then(res => {
+            setCategoryOptions((res.data || []).map(c => ({ value: c.id, label: c.name })));
+        }).catch(() => { }).finally(() => setCategoriesLoading(false));
+    }, []);
 
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -251,10 +262,19 @@ function CreateProductForm({ onCreated }: { onCreated: () => void }) {
                     {errors.price && <p className="mt-1 text-xs text-red-400">{errors.price}</p>}
                 </div>
                 <div>
-                    <label htmlFor="create-category" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Category ID *</label>
-                    <input id="create-category" name="category_id" value={formData.category_id} onChange={handleChange} placeholder="UUID"
-                        className="w-full px-3 py-2 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]" />
-                    {errors.category_id && <p className="mt-1 text-xs text-red-400">{errors.category_id}</p>}
+                    <label htmlFor="create-category" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Category *</label>
+                    <SearchableSelect
+                        id="create-category"
+                        options={categoryOptions}
+                        value={formData.category_id}
+                        onChange={val => {
+                            setFormData(prev => ({ ...prev, category_id: val }));
+                            setErrors(prev => ({ ...prev, category_id: '' }));
+                        }}
+                        placeholder="Select category"
+                        loading={categoriesLoading}
+                        error={errors.category_id}
+                    />
                 </div>
                 <div>
                     <label htmlFor="create-stock" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Stock</label>

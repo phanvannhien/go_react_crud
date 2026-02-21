@@ -14,15 +14,15 @@ import (
 const countUsers = `-- name: CountUsers :one
 SELECT count(*) FROM users
 WHERE
-    ($1::text IS NULL OR email ILIKE '%' || $1 || '%')
-    AND ($2::text IS NULL OR role = $2)
-    AND ($3::boolean IS NULL OR is_active = $3)
+    ($1::text = '' OR email ILIKE '%' || $1 || '%')
+    AND ($2::text = '' OR role = $2)
+    AND ($3::text = '' OR is_active = ($3::text = 'true'))
 `
 
 type CountUsersParams struct {
 	Column1 string `json:"column_1"`
 	Column2 string `json:"column_2"`
-	Column3 bool   `json:"column_3"`
+	Column3 string `json:"column_3"`
 }
 
 func (q *Queries) CountUsers(ctx context.Context, arg CountUsersParams) (int64, error) {
@@ -136,9 +136,9 @@ const listUsers = `-- name: ListUsers :many
 SELECT id, email, role, is_active, created_at, updated_at
 FROM users
 WHERE
-    ($1::text IS NULL OR email ILIKE '%' || $1 || '%')
-    AND ($2::text IS NULL OR role = $2)
-    AND ($3::boolean IS NULL OR is_active = $3)
+    ($1::text = '' OR email ILIKE '%' || $1 || '%')
+    AND ($2::text = '' OR role = $2)
+    AND ($3::text = '' OR is_active = ($3::text = 'true'))
 ORDER BY
     CASE WHEN $6::text = 'email' AND $7::text = 'asc' THEN email END ASC,
     CASE WHEN $6::text = 'email' AND $7::text = 'desc' THEN email END DESC,
@@ -153,7 +153,7 @@ LIMIT $4 OFFSET $5
 type ListUsersParams struct {
 	Column1   string `json:"column_1"`
 	Column2   string `json:"column_2"`
-	Column3   bool   `json:"column_3"`
+	Column3   string `json:"column_3"`
 	Limit     int32  `json:"limit"`
 	Offset    int32  `json:"offset"`
 	SortField string `json:"sort_field"`

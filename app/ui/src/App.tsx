@@ -4,6 +4,8 @@ import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 import UserListPage from './features/user/pages/UserListPage';
 import ProductListPage from './features/product/pages/ProductListPage';
+import OrderListPage from './features/order/pages/OrderListPage';
+import CategoryListPage from './features/category/pages/CategoryListPage';
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAuth();
@@ -27,6 +29,8 @@ function Layout() {
             <div className="flex gap-4">
               <Link to="/users" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">Users</Link>
               <Link to="/products" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">Products</Link>
+              <Link to="/orders" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">Orders</Link>
+              <Link to="/categories" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">Categories</Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -64,6 +68,8 @@ export default function App() {
               <Route path="/" element={<Navigate to="/users" replace />} />
               <Route path="/users" element={<UserListPage />} />
               <Route path="/products" element={<ProductListPage />} />
+              <Route path="/orders" element={<OrderListPage />} />
+              <Route path="/categories" element={<CategoryListPage />} />
             </Route>
           </Route>
         </Routes>
