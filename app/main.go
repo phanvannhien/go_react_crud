@@ -57,11 +57,13 @@ func main() {
 	authService := service.NewAuthService(queries, jwtSecret)
 	userService := service.NewUserService(queries)
 	productService := service.NewProductService(queries)
+	orderService := service.NewOrderService(queries, pool)
 
 	// Initialize handlers
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService)
 	productHandler := handler.NewProductHandler(productService)
+	orderHandler := handler.NewOrderHandler(orderService)
 
 	// Create Echo instance
 	e := echo.New()
@@ -85,6 +87,7 @@ func main() {
 	api := e.Group("/api", middleware.JWTAuth(jwtSecret))
 	routes.RegisterUserRoutes(api, userHandler)
 	routes.RegisterProductRoutes(api, productHandler)
+	routes.RegisterOrderRoutes(api, orderHandler)
 
 	// Health check
 	e.GET("/health", func(c echo.Context) error {

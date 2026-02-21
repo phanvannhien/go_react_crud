@@ -12,19 +12,29 @@ import (
 
 type Querier interface {
 	CountCategories(ctx context.Context) (int64, error)
+	CountOrdersByUserID(ctx context.Context, userID pgtype.UUID) (int64, error)
 	CountUsers(ctx context.Context, arg CountUsersParams) (int64, error)
 	CreateCategory(ctx context.Context, name string) (Category, error)
+	CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error)
+	CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error)
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
+	DeleteOrder(ctx context.Context, id pgtype.UUID) error
+	DeleteOrderItemsByOrderID(ctx context.Context, orderID pgtype.UUID) error
 	DeleteProduct(ctx context.Context, id pgtype.UUID) error
 	DeleteUser(ctx context.Context, id pgtype.UUID) error
 	GetCategoryByID(ctx context.Context, id pgtype.UUID) (Category, error)
+	GetOrderByID(ctx context.Context, id pgtype.UUID) (Order, error)
+	GetOrderItemsByOrderID(ctx context.Context, orderID pgtype.UUID) ([]OrderItem, error)
 	GetProductByID(ctx context.Context, id pgtype.UUID) (Product, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id pgtype.UUID) (GetUserByIDRow, error)
 	ListCategories(ctx context.Context, arg ListCategoriesParams) ([]Category, error)
+	ListOrdersByUserID(ctx context.Context, arg ListOrdersByUserIDParams) ([]Order, error)
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
+	UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) (Order, error)
+	UpdateOrderTotal(ctx context.Context, arg UpdateOrderTotalParams) (Order, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (UpdateUserRow, error)
 }

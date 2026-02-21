@@ -65,3 +65,31 @@ func assertHasError(t *testing.T, result map[string]interface{}) {
 		t.Error("Expected error, got nil")
 	}
 }
+
+// doRequestWithUserID is like doRequest but injects a user_id into the echo context
+// via middleware, simulating an authenticated user without actual JWT validation.
+func doRequestWithUserID(e *echo.Echo, method, path string, body interface{}, userID string) *httptest.ResponseRecorder {
+	var reqBody *bytes.Buffer
+	if body != nil {
+		b, _ := json.Marshal(body)
+		reqBody = bytes.NewBuffer(b)
+	} else {
+		reqBody = bytes.NewBuffer(nil)
+	}
+
+	req := httptest.NewRequest(method, path, reqBody)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+
+	// We need to use a middleware that sets user_id in the context
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("user_id", userID)
+			return next(c)
+		}
+	})
+
+	e.ServeHTTP(rec, req)
+	return rec
+}
