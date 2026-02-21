@@ -37,3 +37,4 @@ ui/.vite/
 *.test
 *.out
 coverage.txt
+*.zip
