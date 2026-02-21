@@ -42,3 +42,19 @@ If output_type == "security_patch":
 Failure in output-type validation:
   → Regenerate
   → If still invalid → Hard Stop
+
+  If output_type == "ui_component":
+  - Must handle loading state
+  - Must handle error state
+  - Must not call API directly without service abstraction
+  - Must avoid business logic in component
+
+If output_type == "ui_page":
+  - Must bind to route
+  - Must enforce access control
+  - Must not exceed component complexity threshold
+
+If output_type == "form_component":
+  - Must include validation
+  - Must disable submit while pending
+  - Must handle API error response

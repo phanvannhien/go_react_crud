@@ -29,6 +29,15 @@ optimize_performance
 investigate_security_issue
   → workflows/bugfix_workflow.md
 
+create_ui_feature
+  → workflows/ui_feature_workflow.md
+
+modify_ui_component
+  → workflows/ui_modification_workflow.md
+
+fix_ui_bug
+  → workflows/ui_bugfix_workflow.md
+
 If no workflow is matched → Hard Stop.
 Phase 4: Skill Routing  
 Phase 5: Dependency Resolution  
